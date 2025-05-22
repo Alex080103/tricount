@@ -1,23 +1,38 @@
-import { Image } from 'expo-image';
-import { ListRenderItem, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { type Group } from '@/types';
-import { FlatList, Text } from 'react-native';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import { FlatList, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 let groups: Group[] = require('../../assets/fixtures/groups.json');
 
 export default function HomeScreen() {
-  const renderGroup: ListRenderItem<Group> = ({ item }) => (
-    <View style={styles.fiche}>
-      <Image style={styles.icon} source={require('@/assets/images/category_icons/food.png')} />
+  const entertainment = require('@/assets/images/category_icons/entertainment.png');
+  const food = require('@/assets/images/category_icons/food.png');
+  const transport = require('@/assets/images/category_icons/transport.png');
+
+  const renderGroup: ListRenderItem<Group> = ({item}) => {
+    let icon;
+    switch(item.category?.title) {
+      case 'Transport':
+        icon = transport
+        break;
+      case 'Alimentation': 
+        icon = food
+        break;
+      default:
+        icon = entertainment 
+    }
+    return (
+    <View style={styles.fiche} onTouchEnd={() => router.navigate('/(tabs)/group')}>
+      <Image style={styles.icon} source={icon} />
       <View>
         <Text style={styles.text}>{item.title}</Text>
         <Text style={[styles.text, styles.description]}>{item.description}</Text>
       </View>
     </View>
-  );
-
+  )}
   return (
     <View style={styles.mainContainer}>
       <Text style={[styles.text, styles.title]}>TriSum</Text>
@@ -76,10 +91,10 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingVertical: 5,
     gap: 10,
-    borderRadius: 10,
+    borderRadius: 20,
     display: 'flex',
     flexDirection: 'row',
-    marginBottom: 20,
+    marginBottom: 20, 
   },
   icon: {
     width: 50,
