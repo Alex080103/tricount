@@ -1,17 +1,17 @@
 [
   {
     "id": 1,
-    "icon_path": "/icons/food.png",
+    "icon_path": "food.png",
     "title": "Alimentation"
   },
   {
     "id": 2,
-    "icon_path": "/icons/transport.png",
+    "icon_path": "transport.png",
     "title": "Transport"
   },
   {
     "id": 3,
-    "icon_path": "/icons/entertainment.png",
+    "icon_path": "entertainment.png",
     "title": "Loisirs"
   }
 ]
