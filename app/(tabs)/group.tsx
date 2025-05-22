@@ -1,8 +1,9 @@
 import FloatingAddButton from "@/components/FloatingAddButton";
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -15,9 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from 'expo-router';
-
-const router = useRouter();
 
 const Tabs: { id: number; name: string }[] = [
   { id: 0, name: "Dépenses" },
@@ -115,8 +113,8 @@ export default function Group() {
     });
   };
   const redirection = () => {
-    router.push('/share');
-  }
+    router.navigate("/share");
+  };
   const handleSaveExpense = () => {
     if (Number.isNaN(newExpense.amount)) {
       alert("Merci de rentrer un nombre valide");
@@ -155,7 +153,7 @@ export default function Group() {
         </View>
         <Text style={[styles.whiteColor, styles.userName]}>{item.name}</Text>
       </View>
-      
+
       <Text
         style={[
           styles.amountText,
@@ -171,7 +169,6 @@ export default function Group() {
 
   const renderExpenseItem = ({ item }: { item: Expense }) => (
     <View style={styles.expenseItem}>
-      
       <View style={styles.expenseHeader}>
         <View style={styles.flexContainer}>
           <View style={styles.userAvatar}>
@@ -209,7 +206,13 @@ export default function Group() {
 
   return (
     <ScrollView style={styles.container}>
-      <AntDesign name="sharealt" size={24} color="white" style={styles.icone} onPress={redirection}/>
+      <AntDesign
+        name="sharealt"
+        size={24}
+        color="white"
+        style={styles.icone}
+        onPress={redirection}
+      />
       <View style={styles.iconContainer}>
         <FontAwesome name="shopping-cart" size={42} color="#387FF6" />
       </View>
@@ -299,8 +302,8 @@ export default function Group() {
               <View style={styles.balanceToggle}>
                 <Text style={[styles.whiteColor, styles.fontSize12]}>
                   {!toPay.payed
-                    ? "Tu dois encore " + toPay.value.toFixed(2) * -1 + " €"
-                    : "Tu as reglé " + toPay.value.toFixed(2) * -1 + " €"}
+                    ? "Tu dois encore " + (toPay.value * -1).toFixed(2) + " €"
+                    : "Tu as reglé " + (toPay.value * -1).toFixed(2) + " €"}
                 </Text>
                 <View style={styles.toggleSwitch}>
                   <View style={styles.toggleButton}></View>
@@ -409,9 +412,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   icone: {
-    position:"absolute",
-    right:40,
-    top:40,
+    position: "absolute",
+    right: 40,
+    top: 40,
   },
   iconContainer: {
     display: "flex",
