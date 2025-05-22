@@ -1,12 +1,16 @@
+import FloatingAddButton from "@/components/FloatingAddButton";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import {
+  Alert,
   FlatList,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -23,21 +27,105 @@ const balanceData = [
   { id: 3, name: "User", amount: -8.75, initials: "U" },
 ];
 
-// Données d'exemple pour les dépenses
-const expenseData = [
-  {
-    id: 1,
-    label: "Label",
-    user: "User",
-    amount: 16.7,
-    date: "Category Item",
-    participants: "Participants du groupe",
-    initials: "U",
-  },
-];
+// Interface pour les dépenses
+interface Expense {
+  id: number;
+  label: string;
+  user: string;
+  amount: number;
+  date: string;
+  participants: string;
+  initials: string;
+}
+
+// Interface pour le formulaire de nouvelle dépense
+interface NewExpenseForm {
+  label: string;
+  amount: string;
+  date: string;
+  participants: string;
+}
 
 export default function Group() {
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [expenseData, setExpenseData] = useState<Expense[]>([
+    {
+      id: 1,
+      label: "Label",
+      user: "User",
+      amount: 16.7,
+      date: "Category Item",
+      participants: "Participants du groupe",
+      initials: "U",
+    },
+  ]);
+
+  // État pour la modal
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newExpense, setNewExpense] = useState<NewExpenseForm>({
+    label: "",
+    amount: "",
+    date: "",
+    participants: "",
+  });
+
+  const handleAddSpending = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    // Reset du formulaire
+    setNewExpense({
+      label: "",
+      amount: "",
+      date: "",
+      participants: "",
+    });
+  };
+
+  const handleSaveExpense = () => {
+    // Validation des champs
+    if (!newExpense.label.trim()) {
+      Alert.alert("Erreur", "Veuillez saisir un libellé");
+      return;
+    }
+
+    if (!newExpense.amount.trim() || isNaN(Number(newExpense.amount))) {
+      Alert.alert("Erreur", "Veuillez saisir un montant valide");
+      return;
+    }
+
+    if (!newExpense.date.trim()) {
+      Alert.alert("Erreur", "Veuillez saisir une date/catégorie");
+      return;
+    }
+
+    if (!newExpense.participants.trim()) {
+      Alert.alert("Erreur", "Veuillez saisir les participants");
+      return;
+    }
+
+    // Création de la nouvelle dépense
+    const expense: Expense = {
+      id: expenseData.length + 1,
+      label: newExpense.label,
+      user: "User", // Pour l'instant, on utilise "User" par défaut
+      amount: parseFloat(newExpense.amount),
+      date: new Date().toLocaleDateString(),
+      participants: "Tous",
+      initials: "U", // Pour l'instant, on utilise "U" par défaut
+    };
+
+    // Ajout à la liste des dépenses
+    setExpenseData([...expenseData, expense]);
+
+    // Fermeture de la modal
+    handleCloseModal();
+
+    // Message de confirmation
+    Alert.alert("Succès", "Dépense ajoutée avec succès!");
+  };
 
   const renderBalanceItem = ({ item }: { item: (typeof balanceData)[0] }) => (
     <View style={styles.balanceItem}>
@@ -60,7 +148,7 @@ export default function Group() {
     </View>
   );
 
-  const renderExpenseItem = ({ item }: { item: (typeof expenseData)[0] }) => (
+  const renderExpenseItem = ({ item }: { item: Expense }) => (
     <View style={styles.expenseItem}>
       <View style={styles.expenseHeader}>
         <View style={styles.flexContainer}>
@@ -207,6 +295,84 @@ export default function Group() {
           </View>
         </View>
       )}
+
+      <FloatingAddButton onPress={handleAddSpending} />
+
+      {/* Modal pour ajouter une dépense */}
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Ajouter une dépense</Text>
+              <TouchableOpacity onPress={handleCloseModal}>
+                <MaterialIcons name="close" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalContent}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Libellé *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Ex: Restaurant, Courses..."
+                  placeholderTextColor="#999"
+                  value={newExpense.label}
+                  onChangeText={(text) =>
+                    setNewExpense({ ...newExpense, label: text })
+                  }
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Montant (€) *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="0.00"
+                  placeholderTextColor="#999"
+                  keyboardType="numeric"
+                  value={newExpense.amount}
+                  onChangeText={(text) =>
+                    setNewExpense({ ...newExpense, amount: text })
+                  }
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Catégorie *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Ex: Courses, voyages, alimentation"
+                  placeholderTextColor="#999"
+                  value={newExpense.date}
+                  onChangeText={(text) =>
+                    setNewExpense({ ...newExpense, date: text })
+                  }
+                />
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={handleCloseModal}
+              >
+                <Text style={styles.cancelButtonText}>Annuler</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSaveExpense}
+              >
+                <Text style={styles.saveButtonText}>Ajouter</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -302,6 +468,26 @@ const styles = StyleSheet.create({
     borderColor: "white",
     marginBlock: 12,
     marginInline: "auto",
+  },
+  // Add Spending Button styles
+  addButtonContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  addSpendingButton: {
+    backgroundColor: "#387FF6",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    gap: 8,
+  },
+  addSpendingText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
   },
   // Balance specific styles
   balanceToggle: {
@@ -408,5 +594,83 @@ const styles = StyleSheet.create({
   },
   expenseDetailText: {
     fontSize: 12,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#1E1E1E",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+    minHeight: "60%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    color: "white",
+    marginBottom: 8,
+    fontWeight: "500",
+  },
+  textInput: {
+    backgroundColor: "#2A2A2A",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: "white",
+    borderWidth: 1,
+    borderColor: "#444",
+  },
+  modalFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#333",
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#666",
+  },
+  saveButton: {
+    backgroundColor: "#387FF6",
+  },
+  cancelButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
