@@ -2,6 +2,8 @@ import { Image } from 'expo-image';
 import { ListRenderItem, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { type Group } from '@/types';
 import { FlatList, Text } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 let groups: Group[] = require('../../assets/fixtures/groups.json');
 
@@ -30,12 +32,14 @@ export default function HomeScreen() {
           style={styles.iconButton}
           onPress={() => console.log('Créer clicked!')}
         >
+          <Ionicons name="create" size={24} color="#007BFF" />
           <Text style={styles.iconText}>Créer</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
           onPress={() => console.log('Rejoindre clicked!')}
         >
+          <AntDesign name="addusergroup" size={24} color="#007BFF" />
           <Text style={styles.iconText}>Rejoindre</Text>
         </TouchableOpacity>
       </View>
@@ -100,10 +104,12 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column',
   },
   iconText: {
     color: '#FFFFFF',
     fontSize: 16,
     textAlign: 'center',
+    marginBottom: 5,
   },
 });
