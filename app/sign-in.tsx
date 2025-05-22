@@ -2,6 +2,7 @@ import { StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'reac
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useState } from 'react';
+import { router} from 'expo-router';
 
 // Fonction pour valider l'e-mail avec une expression régulière
 const validateEmail = (email) => {
@@ -19,18 +20,21 @@ export default function SignUpScreen() {
 
   // Fonction pour afficher une alerte avec les valeurs des champs
   const handleSignUp = () => {
-    Alert.alert(
-      'Inscription',
-      `Nom d'utilisateur: ${username}\nE-mail: ${email}\nMot de passe: ${password}`,
-      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
-    );
+    // Alert.alert(
+    //   'Inscription',
+    //   `Nom d'utilisateur: ${username}\nE-mail: ${email}\nMot de passe: ${password}`,
+    //   [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+    // );
+
+
+    router.push('/(tabs)'); // Naviguer vers la page index
   };
 
   return (
     <ScrollView style={styles.scrollContainer}>
       <ThemedView style={styles.container}>
         <ThemedText type="title" style={styles.appTitle}>
-          Titre de l'appli
+          Trisum
         </ThemedText>
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -42,7 +46,6 @@ export default function SignUpScreen() {
           placeholderTextColor="#888"
           value={username}
           onChangeText={setUsername}
-          selectionColor="#1E90FF" // Ajout pour le curseur
         />
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -55,7 +58,6 @@ export default function SignUpScreen() {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
-          selectionColor="#1E90FF" // Ajout pour le curseur
         />
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -68,7 +70,6 @@ export default function SignUpScreen() {
           secureTextEntry
           value={password}
           onChangeText={setPassword}
-          selectionColor="#1E90FF" // Ajout pour le curseur
         />
 
         <ThemedText style={styles.linkText}>
@@ -79,7 +80,7 @@ export default function SignUpScreen() {
         <TouchableOpacity
           style={styles.button(isFormValid)}
           disabled={!isFormValid}
-          onPress={handleSignUp}
+          onPress={handleSignUp} // Appeler la fonction au clic
         >
           <ThemedText style={styles.buttonText}>S'inscrire</ThemedText>
         </TouchableOpacity>
