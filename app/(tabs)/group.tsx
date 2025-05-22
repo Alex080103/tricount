@@ -3,7 +3,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -22,13 +22,6 @@ const router = useRouter();
 const Tabs: { id: number; name: string }[] = [
   { id: 0, name: "Dépenses" },
   { id: 1, name: "Équilibre" },
-];
-
-// Données d'exemple pour l'équilibre
-const balanceData = [
-  { id: 1, name: "User", amount: -18.75, initials: "U" },
-  { id: 2, name: "User", amount: 16.75, initials: "U" },
-  { id: 3, name: "User", amount: -8.75, initials: "U" },
 ];
 
 // Interface pour les dépenses
@@ -55,12 +48,12 @@ export default function Group() {
   const [expenseData, setExpenseData] = useState<Expense[]>([
     {
       id: 1,
-      label: "Label",
-      user: "User",
+      label: "Miam",
+      user: "Louis",
       amount: 16.7,
-      date: "Category Item",
-      participants: "Participants du groupe",
-      initials: "U",
+      date: new Date("2025-05-21").toLocaleDateString(),
+      participants: "Tous",
+      initials: "L",
     },
   ]);
 
@@ -72,6 +65,40 @@ export default function Group() {
     date: "",
     participants: "",
   });
+  const [totalExpenses, setTotalExpenses] = useState(16.7);
+  const [myTotalExpenses, setMyTotalExpenses] = useState(16.7);
+  const [toPay, setToPay] = useState<{ payed: boolean; value: number }>({
+    payed: false,
+    value: 0,
+  });
+
+  const [balance, setBalance] = useState([
+    { id: 0, name: "Louis", amount: -18.75, initials: "L" },
+    { id: 1, name: "Loïc", amount: 16.75, initials: "L" },
+    { id: 2, name: "Alexandre", amount: 0, initials: "A" },
+  ]);
+  // Données d'exemple pour l'équilibre
+
+  // Use effect qui modifie les valeurs a chaque changement de totalExpense
+  useEffect(() => {
+    const newBalance = balance.map((item) => {
+      if (item.name == "Alexandre") {
+        setToPay({
+          payed: toPay.payed,
+          value: totalExpenses / balance.length - myTotalExpenses,
+        });
+      }
+      return {
+        id: item.id,
+        name: item.name,
+        amount:
+          totalExpenses / balance.length -
+          (item.name == "Alexandre" ? myTotalExpenses : 0),
+        initials: item.initials,
+      };
+    });
+    setBalance([...newBalance]);
+  }, [totalExpenses]);
 
   const handleAddSpending = () => {
     setIsModalVisible(true);
@@ -91,38 +118,25 @@ export default function Group() {
     router.push('/share');
   }
   const handleSaveExpense = () => {
-    // Validation des champs
-    if (!newExpense.label.trim()) {
-      Alert.alert("Erreur", "Veuillez saisir un libellé");
-      return;
+    if (Number.isNaN(newExpense.amount)) {
+      alert("Merci de rentrer un nombre valide");
     }
-
-    if (!newExpense.amount.trim() || isNaN(Number(newExpense.amount))) {
-      Alert.alert("Erreur", "Veuillez saisir un montant valide");
-      return;
-    }
-
-    if (!newExpense.date.trim()) {
-      Alert.alert("Erreur", "Veuillez saisir une date/catégorie");
-      return;
-    }
-
-    if (!newExpense.participants.trim()) {
-      Alert.alert("Erreur", "Veuillez saisir les participants");
-      return;
-    }
-
+    setTotalExpenses((prev) => {
+      return prev + Number.parseFloat(newExpense.amount);
+    });
+    setMyTotalExpenses((prev) => {
+      return prev + Number.parseFloat(newExpense.amount);
+    });
     // Création de la nouvelle dépense
     const expense: Expense = {
       id: expenseData.length + 1,
       label: newExpense.label,
-      user: "User", // Pour l'instant, on utilise "User" par défaut
+      user: "Alexandre", // Pour l'instant, on utilise "User" par défaut
       amount: parseFloat(newExpense.amount),
       date: new Date().toLocaleDateString(),
       participants: "Tous",
-      initials: "U", // Pour l'instant, on utilise "U" par défaut
+      initials: "A", // Pour l'instant, on utilise "U" par défaut
     };
-
     // Ajout à la liste des dépenses
     setExpenseData([...expenseData, expense]);
 
@@ -244,7 +258,7 @@ export default function Group() {
                     styles.textCenter,
                   ]}
                 >
-                  25€
+                  {myTotalExpenses.toFixed(2)}€
                 </Text>
               </View>
             </View>
@@ -261,7 +275,7 @@ export default function Group() {
                     styles.textCenter,
                   ]}
                 >
-                  30€
+                  {totalExpenses.toFixed(2)}€
                 </Text>
               </View>
             </View>
@@ -284,7 +298,9 @@ export default function Group() {
             <View style={[styles.flexContainer, styles.gap8]}>
               <View style={styles.balanceToggle}>
                 <Text style={[styles.whiteColor, styles.fontSize12]}>
-                  Tu dois encore 18.75 €
+                  {!toPay.payed
+                    ? "Tu dois encore " + toPay.value.toFixed(2) * -1 + " €"
+                    : "Tu as reglé " + toPay.value.toFixed(2) * -1 + " €"}
                 </Text>
                 <View style={styles.toggleSwitch}>
                   <View style={styles.toggleButton}></View>
@@ -296,7 +312,7 @@ export default function Group() {
 
           <View style={styles.balanceList}>
             <FlatList
-              data={balanceData}
+              data={balance}
               renderItem={renderBalanceItem}
               keyExtractor={(item) => item.id.toString()}
               scrollEnabled={false}
