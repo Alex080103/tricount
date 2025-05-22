@@ -1,15 +1,30 @@
-import { StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useState } from 'react';
+
+// Fonction pour valider l'e-mail avec une expression régulière
+const validateEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
+};
 
 export default function SignUpScreen() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Vérifier si tous les champs sont remplis
-  const isFormValid = username.trim() !== '' && email.trim() !== '' && password.trim() !== '';
+  // Vérifier si tous les champs sont remplis et si l'e-mail est valide
+  const isFormValid = username.trim() !== '' && validateEmail(email) && password.trim() !== '';
+
+  // Fonction pour afficher une alerte avec les valeurs des champs
+  const handleSignUp = () => {
+    Alert.alert(
+      'Inscription',
+      `Nom d'utilisateur: ${username}\nE-mail: ${email}\nMot de passe: ${password}`,
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+    );
+  };
 
   return (
     <ScrollView style={styles.scrollContainer}>
@@ -27,6 +42,7 @@ export default function SignUpScreen() {
           placeholderTextColor="#888"
           value={username}
           onChangeText={setUsername}
+          selectionColor="#1E90FF" // Ajout pour le curseur
         />
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -39,6 +55,7 @@ export default function SignUpScreen() {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
+          selectionColor="#1E90FF" // Ajout pour le curseur
         />
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -51,6 +68,7 @@ export default function SignUpScreen() {
           secureTextEntry
           value={password}
           onChangeText={setPassword}
+          selectionColor="#1E90FF" // Ajout pour le curseur
         />
 
         <ThemedText style={styles.linkText}>
@@ -58,7 +76,11 @@ export default function SignUpScreen() {
           <ThemedText style={styles.link}>Connectez vous</ThemedText>
         </ThemedText>
 
-        <TouchableOpacity style={styles.button(isFormValid)} disabled={!isFormValid}>
+        <TouchableOpacity
+          style={styles.button(isFormValid)}
+          disabled={!isFormValid}
+          onPress={handleSignUp}
+        >
           <ThemedText style={styles.buttonText}>S'inscrire</ThemedText>
         </TouchableOpacity>
       </ThemedView>
@@ -75,7 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     paddingTop: 120,
-    minHeight: 1000,
+    minHeight: 900,
   },
   appTitle: {
     color: '#FFFFFF',
