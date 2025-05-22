@@ -1,12 +1,19 @@
 import { StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useState } from 'react';
 
 export default function SignUpScreen() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Vérifier si tous les champs sont remplis
+  const isFormValid = username.trim() !== '' && email.trim() !== '' && password.trim() !== '';
+
   return (
     <ScrollView style={styles.scrollContainer}>
       <ThemedView style={styles.container}>
-        {/* Ajout du titre */}
         <ThemedText type="title" style={styles.appTitle}>
           Titre de l'appli
         </ThemedText>
@@ -18,6 +25,8 @@ export default function SignUpScreen() {
           style={styles.input}
           placeholder="Entrez votre nom d'utilisateur"
           placeholderTextColor="#888"
+          value={username}
+          onChangeText={setUsername}
         />
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -28,6 +37,8 @@ export default function SignUpScreen() {
           placeholder="Entrez votre e-mail"
           placeholderTextColor="#888"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
 
         <ThemedText type="subtitle" style={styles.label}>
@@ -38,6 +49,8 @@ export default function SignUpScreen() {
           placeholder="Entrez votre mot de passe"
           placeholderTextColor="#888"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
 
         <ThemedText style={styles.linkText}>
@@ -45,7 +58,7 @@ export default function SignUpScreen() {
           <ThemedText style={styles.link}>Connectez vous</ThemedText>
         </ThemedText>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button(isFormValid)} disabled={!isFormValid}>
           <ThemedText style={styles.buttonText}>S'inscrire</ThemedText>
         </TouchableOpacity>
       </ThemedView>
@@ -56,20 +69,20 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
-    backgroundColor: '#353636', // Fond sombre
+    backgroundColor: '#353636',
   },
   container: {
     flex: 1,
     padding: 16,
-    paddingTop: 0, // Pas de padding supplémentaire en haut
-    minHeight: 900,
+    paddingTop: 120,
+    minHeight: 1000,
   },
   appTitle: {
     color: '#FFFFFF',
-    fontSize: 28, // Taille plus grande pour le titre
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 24, // Espace entre le titre et le premier champ
+    marginBottom: 54,
   },
   label: {
     color: '#FFFFFF',
@@ -94,13 +107,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textDecorationLine: 'underline',
   },
-  button: {
-    backgroundColor: '#1E90FF',
+  button: (isValid) => ({
+    backgroundColor: isValid ? '#1E90FF' : '#A0A0A0',
     borderRadius: 25,
     paddingVertical: 12,
     alignItems: 'center',
     marginTop: 8,
-  },
+  }),
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
