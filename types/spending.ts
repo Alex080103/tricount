@@ -3,7 +3,7 @@ import type { Category, Group, User } from "@/types"
 type Spending = {
     id: number
     spender: User
-    Group: Group
+    group: Group
     category?: Category
     value: number
     label: string

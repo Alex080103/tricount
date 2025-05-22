@@ -14,7 +14,7 @@ type Group = {
     description: string
     created_at: Date
     archived_at?: number
-    active_user_balance: number
+    active_user_spending_sum: number
     total: number
 }
 
